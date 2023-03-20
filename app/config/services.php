@@ -3,6 +3,11 @@ use Ubiquity\controllers\Router;
 
 \Ubiquity\cache\CacheManager::startProd($config);
 \Ubiquity\orm\DAO::start();
-Router::start();
+Router::startAll();
 Router::addRoute("_default", "controllers\\IndexController");
-\Ubiquity\assets\AssetsManager::start($config);
+
+\Ubiquity\events\EventsManager::addListener(\Ubiquity\events\DAOEvents::BEFORE_INSERT, function ($instance) {
+    if ($instance instanceof \models\User_) {
+        $instance->setPassword(password_hash($instance->getPassword(), PASSWORD_DEFAULT));
+    }
+});
