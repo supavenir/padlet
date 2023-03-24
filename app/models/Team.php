@@ -11,6 +11,7 @@ use Ubiquity\attributes\items\JoinColumn;
 use Ubiquity\attributes\items\ManyToMany;
 use Ubiquity\attributes\items\JoinTable;
 
+#[\AllowDynamicProperties()]
 #[Table(name: "team")]
 class Team{
 	
@@ -30,18 +31,18 @@ class Team{
 
 	
 	#[ManyToOne()]
-	#[JoinColumn(className: "models\\User_",name: "idOwner")]
-	private $user_;
+	#[JoinColumn(className: "models\\User",name: "idOwner")]
+	private $user;
 
 	
-	#[ManyToMany(targetEntity: "models\\User_",inversedBy: "teams")]
-	#[JoinTable(name: "teammember",inverseJoinColumns: ["name"=>"idUser","referencedColumnName"=>"id"])]
-	private $user_s;
+	#[ManyToMany(targetEntity: "models\\User",inversedBy: "teams")]
+	#[JoinTable(name: "teammember")]
+	private $users;
 
 
 	 public function __construct(){
 		$this->padlets = [];
-		$this->user_s = [];
+		$this->users = [];
 	}
 
 
@@ -81,33 +82,33 @@ class Team{
 	}
 
 
-	public function getUser_(){
-		return $this->user_;
+	public function getUser(){
+		return $this->user;
 	}
 
 
-	public function setUser_($user_){
-		$this->user_=$user_;
+	public function setUser($user){
+		$this->user=$user;
 	}
 
 
-	public function getUser_s(){
-		return $this->user_s;
+	public function getUsers(){
+		return $this->users;
 	}
 
 
-	public function setUser_s($user_s){
-		$this->user_s=$user_s;
+	public function setUsers($users){
+		$this->users=$users;
 	}
 
 
-	 public function addUser_($user_){
-		$this->user_s[]=$user_;
+	 public function addUser($user){
+		$this->users[]=$user;
 	}
 
 
 	 public function __toString(){
-		return $this->id.'';
+		return ($this->name??'no value').'';
 	}
 
 }

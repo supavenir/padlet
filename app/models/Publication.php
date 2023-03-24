@@ -10,6 +10,7 @@ use Ubiquity\attributes\items\ManyToOne;
 use Ubiquity\attributes\items\JoinColumn;
 use Ubiquity\attributes\items\OneToMany;
 
+#[\AllowDynamicProperties()]
 #[Table(name: "publication")]
 class Publication{
 	
@@ -67,8 +68,8 @@ class Publication{
 
 	
 	#[ManyToOne()]
-	#[JoinColumn(className: "models\\User_",name: "idCreator")]
-	private $user_;
+	#[JoinColumn(className: "models\\User",name: "idCreator")]
+	private $user;
 
 
 	 public function __construct(){
@@ -199,18 +200,18 @@ class Publication{
 	}
 
 
-	public function getUser_(){
-		return $this->user_;
+	public function getUser(){
+		return $this->user;
 	}
 
 
-	public function setUser_($user_){
-		$this->user_=$user_;
+	public function setUser($user){
+		$this->user=$user;
 	}
 
 
 	 public function __toString(){
-		return $this->id.'';
+		return ($this->title??'no value').'';
 	}
 
 }

@@ -1,7 +1,9 @@
 <?php
 namespace controllers;
+use models\Team;
+use models\User;
 use Ubiquity\attributes\items\router\Get;
-use Ubiquity\attributes\items\router\Route;
+use Ubiquity\orm\DAO;
 
 /**
  * Controller TestController
@@ -16,6 +18,11 @@ class TestController extends \controllers\ControllerBase {
 
 	#[Get(path: "/hello/test/{message}",name: "test.hello")]
 	public function hello($message) {
+		$user=DAO::getById(User::class,1);
+		$team=new Team();
+		$team->setName($message);
+		$team->setUser($user);
+		DAO::insert($team);
 		$this->loadView('TestController/hello.html',compact('message'));
 	}
 

@@ -8,6 +8,7 @@ use Ubiquity\attributes\items\Table;
 use Ubiquity\attributes\items\ManyToOne;
 use Ubiquity\attributes\items\JoinColumn;
 
+#[\AllowDynamicProperties()]
 #[Table(name: "padletproperty")]
 class Padletproperty{
 	
@@ -89,7 +90,7 @@ class Padletproperty{
 
 
 	 public function __toString(){
-		return $this->idPadlet.'';
+		return ($this->pValue??'no value').'';
 	}
 
 }

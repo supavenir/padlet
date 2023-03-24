@@ -9,6 +9,7 @@ use Ubiquity\attributes\items\OneToMany;
 use Ubiquity\attributes\items\ManyToMany;
 use Ubiquity\attributes\items\JoinTable;
 
+#[\AllowDynamicProperties()]
 #[Table(name: "properties")]
 class Properties{
 	
@@ -119,7 +120,7 @@ class Properties{
 
 
 	 public function __toString(){
-		return $this->id.'';
+		return ($this->name??'no value').'';
 	}
 
 }

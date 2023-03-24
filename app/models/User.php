@@ -10,8 +10,9 @@ use Ubiquity\attributes\items\OneToMany;
 use Ubiquity\attributes\items\ManyToMany;
 use Ubiquity\attributes\items\JoinTable;
 
-#[Table(name: "user_")]
-class User_{
+#[\AllowDynamicProperties()]
+#[Table(name: "user")]
+class User{
 	
 	#[Id()]
 	#[Column(name: "id",dbType: "int(11)")]
@@ -26,38 +27,39 @@ class User_{
 	
 	#[Column(name: "password",nullable: true,dbType: "varchar(255)")]
 	#[Validator(type: "length",constraints: ["max"=>"255"])]
-	#[Transformer(name: "password")]
+	#[Transformer(name: "hpassword")]
 	private $password;
 
 	
 	#[Column(name: "email",nullable: true,dbType: "varchar(255)")]
 	#[Validator(type: "email",constraints: [])]
 	#[Validator(type: "length",constraints: ["max"=>"255"])]
+	#[Transformer(name: "crypt")]
 	private $email;
 
 	
-	#[OneToMany(mappedBy: "user_",className: "models\\Comment")]
+	#[OneToMany(mappedBy: "user",className: "models\\Comment")]
 	private $comments;
 
 	
-	#[OneToMany(mappedBy: "user_",className: "models\\Padlet")]
+	#[OneToMany(mappedBy: "user",className: "models\\Padlet")]
 	private $padlets;
 
 	
-	#[OneToMany(mappedBy: "user_",className: "models\\Pubevaluation")]
+	#[OneToMany(mappedBy: "user",className: "models\\Pubevaluation")]
 	private $pubevaluations;
 
 	
-	#[OneToMany(mappedBy: "user_",className: "models\\Publication")]
+	#[OneToMany(mappedBy: "user",className: "models\\Publication")]
 	private $publications;
 
 	
-	#[OneToMany(mappedBy: "user_",className: "models\\Team")]
+	#[OneToMany(mappedBy: "user",className: "models\\Team")]
 	private $teams;
 
 	
-	#[ManyToMany(targetEntity: "models\\Team",inversedBy: "user_s")]
-	#[JoinTable(name: "teammember",joinColumns: ["name"=>"idUser","referencedColumnName"=>"id"])]
+	#[ManyToMany(targetEntity: "models\\Team",inversedBy: "users")]
+	#[JoinTable(name: "teammember")]
 	private $teammembers;
 
 
@@ -123,7 +125,7 @@ class User_{
 
 	 public function addToComments($comment){
 		$this->comments[]=$comment;
-		$comment->setUser_($this);
+		$comment->setUser($this);
 	}
 
 
@@ -139,7 +141,7 @@ class User_{
 
 	 public function addToPadlets($padlet){
 		$this->padlets[]=$padlet;
-		$padlet->setUser_($this);
+		$padlet->setUser($this);
 	}
 
 
@@ -155,7 +157,7 @@ class User_{
 
 	 public function addToPubevaluations($pubevaluation){
 		$this->pubevaluations[]=$pubevaluation;
-		$pubevaluation->setUser_($this);
+		$pubevaluation->setUser($this);
 	}
 
 
@@ -171,7 +173,7 @@ class User_{
 
 	 public function addToPublications($publication){
 		$this->publications[]=$publication;
-		$publication->setUser_($this);
+		$publication->setUser($this);
 	}
 
 
@@ -187,7 +189,7 @@ class User_{
 
 	 public function addToTeams($team){
 		$this->teams[]=$team;
-		$team->setUser_($this);
+		$team->setUser($this);
 	}
 
 
@@ -207,7 +209,7 @@ class User_{
 
 
 	 public function __toString(){
-		return ($this->login??'no value').'';
+		return ($this->email??'no value').'';
 	}
 
 }
