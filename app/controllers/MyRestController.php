@@ -79,7 +79,6 @@ class MyRestController extends \Ubiquity\controllers\rest\api\json\JsonRestContr
 	* @authorization
 	*/
 	#[Post('{resource}',priority: 0)]
-    #[Authorization]
 	public function add($resource) {
         TransformersManager::startProd('transform');
 		parent::add_($resource);
