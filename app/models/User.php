@@ -20,9 +20,10 @@ class User{
 	private $id;
 
 	
-	#[Column(name: "login",dbType: "varchar(30)")]
-	#[Validator(type: "length",constraints: ["max"=>"30","notNull"=>true])]
-	private $login;
+	#[Column(name: "login",dbType: "varchar(255)")]
+	#[Validator(type: "length",constraints: ["max"=>"255","notNull"=>true])]
+	#[Transformer('crypt')]
+    private $login;
 
 	
 	#[Column(name: "password",nullable: true,dbType: "varchar(255)")]
