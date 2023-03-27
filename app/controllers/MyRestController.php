@@ -1,4 +1,5 @@
 <?php
+
 namespace controllers;
 
 use models\User;
@@ -12,8 +13,11 @@ use Ubiquity\attributes\items\router\Route;
 use Ubiquity\attributes\items\rest\Rest;
 use Ubiquity\contents\transformation\TransformersManager;
 use Ubiquity\controllers\rest\RestServer;
+use Ubiquity\controllers\Router;
 use Ubiquity\orm\DAO;
+use Ubiquity\security\data\EncryptionManager;
 use Ubiquity\utils\http\URequest;
+use Ubiquity\utils\http\UResponse;
 
 #[Rest()]
 #[Route(path: "/api/")]
@@ -29,8 +33,8 @@ class MyRestController extends \Ubiquity\controllers\rest\api\json\JsonRestContr
 	 *
 	 * @route("{resource}/","methods"=>["get"],"priority"=>0)
 	 */
-	#[Get('{resource}',priority: 0)]
-	public function all($resource){
+	#[Get('{resource}', priority: 0)]
+	public function all($resource) {
 		$this->getAll_($resource);
 	}
 
@@ -43,8 +47,8 @@ class MyRestController extends \Ubiquity\controllers\rest\api\json\JsonRestContr
 	 * @route("{resource}/{id}/","methods"=>["get"],"priority"=>1000)
 	 */
 	#[Get('{resource}/{id}', priority: 1000)]
-	public function one($resource,$id){
-		$this->getOne_($resource,$id);
+	public function one($resource, $id) {
+		$this->getOne_($resource, $id);
 	}
 
 	/**
@@ -57,30 +61,31 @@ class MyRestController extends \Ubiquity\controllers\rest\api\json\JsonRestContr
 	 * @authorization
 	 */
 	#[Delete('{resource}/{id}')]
-	public function delete($resource,...$id){
-		$this->delete_($resource,...$id);
+	public function delete($resource, ...$id) {
+		$this->delete_($resource, ...$id);
 	}
 
 	/**
-	* Route for CORS
-	*
-	* @route("{resource}","methods"=>["options"],"priority"=>3000)
-	*/
-	#[Options('{resource}',priority: 3000)]
+	 * Route for CORS
+	 *
+	 * @route("{resource}","methods"=>["options"],"priority"=>3000)
+	 */
+	#[Options('{resource}', priority: 3000)]
 	public function options(...$resource) {
 	}
 
 	/**
-	* Inserts a new instance of $resource.
-	* Data attributes are send in request body (in JSON format)
-	*
-	* @param string $resource The resource (model) to use
-	* @route("{resource}/","methods"=>["post"],"priority"=>0)
-	* @authorization
-	*/
-	#[Post('{resource}',priority: 0)]
+	 * Inserts a new instance of $resource.
+	 * Data attributes are send in request body (in JSON format)
+	 *
+	 * @param string $resource The resource (model) to use
+	 * @route("{resource}/","methods"=>["post"],"priority"=>0)
+	 * @authorization
+	 */
+	#[Post('{resource}', priority: 0)]
+	#[Authorization]
 	public function add($resource) {
-        TransformersManager::startProd('transform');
+		TransformersManager::startProd('transform');
 		parent::add_($resource);
 	}
 
@@ -93,29 +98,42 @@ class MyRestController extends \Ubiquity\controllers\rest\api\json\JsonRestContr
 	 * @route("{resource}/{id}","methods"=>["patch"],"priority"=>0)
 	 * @authorization
 	 */
-	#[Put('{resource}/{id}',priority: 0)]
-	public function update($resource,...$id ){
+	#[Put('{resource}/{id}', priority: 0)]
+	public function update($resource, ...$id) {
 		TransformersManager::startProd('transform');
-		parent::update_($resource,...$id);
+		parent::update_($resource, ...$id);
 	}
 
 	protected function getRestServer(): RestServer {
-		$srv= new RestServer($this->config);
+		$srv = new RestServer($this->config);
 		$srv->setAllowedOrigins(['http://127.0.0.1:3000']);
 		TransformersManager::startProd('toView');
 		return $srv;
 	}
-    #[Post('connect',priority: 10)]
+
+	/**
+	 * Connection to the API
+	 * Returns a token and the user
+	 * @route("connect","methods"=>["post"],"priority"=>10)
+	 * @throws \Exception
+	 * @throws \Ubiquity\exceptions\DAOException
+	 */
+	#[Post('connect', priority: 10)]
 	public function connect() {
-		if(URequest::has('login')){
-            $login=URequest::post('login');
-            $user=DAO::getOne(User::class,'login=?',$login);
-            if($user){
-                if(URequest::password_verify('password',$user->getPassword())){
-                    parent::connect();
-                }
-            }
-            throw new \Exception('Unauthorized',401);
-        }
+		if (URequest::has('login')) {
+			DAO::$useTransformers = false;
+			$user = DAO::getOne(User::class, 'login= ?', false, [URequest::post('login')]);
+			DAO::$useTransformers = true;
+			if ($user && URequest::password_verify('password', $user->getPassword())) {
+				$tokenInfos = $this->server->connect();
+				$tokenInfos['user'] = $user;
+				echo $this->_format($tokenInfos);
+				return;
+			}
+			Router::setStatusCode(401);
+			throw new \Exception('Unauthorized', 401);
+		}
 	}
+
 }
+

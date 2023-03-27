@@ -8,4 +8,5 @@ class Admin extends UbiquityMyAdminBaseController{
 		parent::initialize();
 		DAO::$useTransformers = true;
 	}
+
 }

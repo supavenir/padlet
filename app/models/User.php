@@ -22,7 +22,6 @@ class User{
 	
 	#[Column(name: "login",dbType: "varchar(255)")]
 	#[Validator(type: "length",constraints: ["max"=>"255","notNull"=>true])]
-	#[Transformer('crypt')]
     private $login;
 
 	
